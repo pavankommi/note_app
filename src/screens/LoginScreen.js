@@ -47,8 +47,6 @@ export default function LoginScreen({ navigation }) {
         } else {
 
             let data = JSON.stringify({
-                // "email": "rkodali1s@semo.edu",
-                // "password": "Rupa.123"
                 "email": `${email}`,
                 "password": `${password}`
             });
