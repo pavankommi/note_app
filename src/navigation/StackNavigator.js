@@ -1,30 +1,91 @@
-import React from 'react'
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react'
+import { CommonActions, NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
+import * as SecureStore from 'expo-secure-store';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import ScreenNames from './Constants.js'
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ForgetPasswordScreen from '../screens/ForgetPasswordScreen';
-import { constants } from '../constants/Constants';
+import { constants, methods, urls } from '../constants/Constants';
 import EnterOtpScreen from '../screens/EnterOtpScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
+import HomeScreen from '../screens/HomeScreen.js';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons.js';
+import { apiRequest, logoutRequest } from '../Api.js';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 
 export default function StackNavigator() {
+
+    const [token, setToken] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [initialScreen, setInitialScreen] = useState(ScreenNames.LoginScreen)
+
+    const Stack = createNativeStackNavigator();
+    const navigation = useNavigation();
+
+    const theme = useTheme();
 
     const [loaded] = useFonts({
         Montserrat: require('../../assets/Montserrat-Bold.otf'),
     });
 
+    useEffect(() => {
+        let key = 'secure_token'
+        async function getToken(key) {
+            let result = await SecureStore.getItemAsync(key);
+            if (result) {
+                setInitialScreen(ScreenNames.HomeScreen)
+                console.log("🔐 Here's your value - StackNavigator🔐 \n" + result);
+            } else {
+                setInitialScreen(ScreenNames.LoginScreen)
+                console.log('No values stored under that key.');
+            }
+        }
+        getToken(key)
+    }, [])
+
+    async function deleteToken(key) {
+        await SecureStore.deleteItemAsync(key)
+    }
+
+    const logoutHandle = (token) => {
+
+        let headers = { 'Authorization': `Bearer {{${token}}}` }
+
+        setLoading(true)
+        logoutRequest(methods.POST, urls.logout, headers)
+            .then(response => {
+                console.log(response.data.message)
+                deleteToken('secure_token')
+                setLoading(false)
+                navigation.dispatch(
+                    CommonActions.reset({
+                        index: 1,
+                        routes: [
+                            { name: ScreenNames.LoginScreen }
+                        ],
+                    })
+                );
+                // navigation.reset(ScreenNames.LoginScreen)
+            })
+            .catch(error => {
+                console.log(error)
+                // showPopUp(error.response.data.message)
+                setLoading(false)
+            })
+
+    }
+
     if (!loaded) {
         return null;
     }
 
-    const Stack = createNativeStackNavigator();
-
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+            initialRouteName={initialScreen}
+        >
             <Stack.Screen
                 name={ScreenNames.LoginScreen}
                 component={LoginScreen}
@@ -78,6 +139,27 @@ export default function StackNavigator() {
                         fontFamily: "Montserrat"
                     },
                     headerTitleAlign: "center"
+                }}
+            />
+            <Stack.Screen
+                name={ScreenNames.HomeScreen}
+                component={HomeScreen}
+                options={{
+                    title: constants.appName,
+                    headerTitleStyle: {
+                        fontFamily: "Montserrat"
+                    },
+                    headerTitleAlign: "center",
+                    headerRight: () => (
+                        <View>
+                            {loading ? <ActivityIndicator color={theme.colors.primary} size={26} /> :
+                                <TouchableOpacity
+                                    onPress={() => logoutHandle(token)}
+                                >
+                                    <MaterialIcons name='logout' size={26} color='black' />
+                                </TouchableOpacity>}
+                        </View>
+                    )
                 }}
             />
         </Stack.Navigator>

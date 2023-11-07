@@ -5,7 +5,8 @@ import { showMessage, hideMessage } from "react-native-flash-message";
 import TextComponent from '../components/TextComponent'
 import ScreenNames from '../navigation/Constants.js'
 import LoaderComponent from '../components/LoaderComponent';
-import { validateEmail } from '../constants/Constants';
+import { methods, urls, validateEmail } from '../constants/Constants';
+import { apiRequest } from '../Api.js';
 
 export default function LoginScreen({ navigation }) {
 
@@ -19,6 +20,15 @@ export default function LoginScreen({ navigation }) {
 
     const theme = useTheme();
 
+    const showPopUp = (data) => {
+        showMessage({
+            message: "Note Down.",
+            description: data,
+            titleStyle: { marginTop: StatusBar.currentHeight },
+            backgroundColor: theme.colors.primary
+        });
+    }
+
     const loginHandle = () => {
         if (email.length == 0) {
             setEmailError(true)
@@ -27,35 +37,39 @@ export default function LoginScreen({ navigation }) {
             setPasswordError(true)
         }
         if (email.length == 0 && password.length == 0) {
-            showMessage({
-                message: "Note Down.",
-                description: "Please enter email and password",
-                titleStyle: { marginTop: StatusBar.currentHeight },
-                backgroundColor: theme.colors.primary
-            });
+            showPopUp("Please enter email and password")
         } else if (email.length == 0) {
-            showMessage({
-                message: "Note Down.",
-                description: "Please enter email",
-                titleStyle: { marginTop: StatusBar.currentHeight },
-                backgroundColor: theme.colors.primary
-            });
+            showPopUp("Please enter email")
         } else if (password.length == 0) {
-            showMessage({
-                message: "Note Down.",
-                description: "Please enter password",
-                titleStyle: { marginTop: StatusBar.currentHeight },
-                backgroundColor: theme.colors.primary
-            });
+            showPopUp("Please enter password")
         } else if (validateEmail(email)) {
-            showMessage({
-                message: "Note Down.",
-                description: "Please enter valid email",
-                titleStyle: { marginTop: StatusBar.currentHeight },
-                backgroundColor: theme.colors.primary
-            });
+            showPopUp("Please enter valid email")
         } else {
-            console.log('user login')
+
+            let data = JSON.stringify({
+                // "email": "rkodali1s@semo.edu",
+                // "password": "Rupa.123"
+                "email": `${email}`,
+                "password": `${password}`
+            });
+
+            setLoading(true)
+
+            apiRequest(methods.POST, urls.loginUrl, data)
+                .then(response => {
+                    console.log(response.data)
+                    setLoading(false)
+                    navigation.replace(ScreenNames.EnterOtpScreen, {
+                        email: email,
+                        screen: 'login'
+                    })
+                })
+                .catch(error => {
+                    console.log(error.response.data)
+                    showPopUp(error.response.data.message)
+                    setLoading(false)
+                })
+
         }
     }
 

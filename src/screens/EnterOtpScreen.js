@@ -3,8 +3,14 @@ import { StatusBar, View } from 'react-native'
 import { Button, TextInput, useTheme } from 'react-native-paper'
 import ScreenNames from '../navigation/Constants.js'
 import { showMessage } from 'react-native-flash-message'
+import * as SecureStore from 'expo-secure-store';
+import { apiRequest } from '../Api.js'
+import { methods, urls } from '../constants/Constants.js'
+import LoaderComponent from '../components/LoaderComponent.js'
 
-export default function EnterOtpScreen({ navigation }) {
+export default function EnterOtpScreen({ route, navigation }) {
+
+    const { email, screen } = route.params;
 
     const [loading, setLoading] = useState(false)
     const [otp, setOtp] = useState('')
@@ -14,20 +20,50 @@ export default function EnterOtpScreen({ navigation }) {
 
     const theme = useTheme();
 
+    async function saveToken(key, value) {
+        await SecureStore.setItemAsync(key, value);
+    }
+
+    const showPopUp = (data) => {
+        showMessage({
+            message: "Note Down.",
+            description: data,
+            titleStyle: { marginTop: StatusBar.currentHeight },
+            backgroundColor: theme.colors.primary
+        });
+    }
+
     const submitHandle = () => {
         if (otp.length == 0) {
             setOtpError(true)
         }
         if (otp.length == 0) {
-            showMessage({
-                message: "Note Down.",
-                description: "Please enter OTP",
-                titleStyle: { marginTop: StatusBar.currentHeight },
-                backgroundColor: theme.colors.primary
-            });
+            showPopUp("Please enter OTP")
         } else {
-            setOtpError(false)
-            navigation.navigate(ScreenNames.ChangePasswordScreen)
+
+            let data = JSON.stringify({
+                // "email": "rkodali1s@semo.edu",
+                // "password": "Rupa.123"
+                "email": `${email}`,
+                "code": `${'666666'}`
+            });
+
+            setLoading(true)
+
+            apiRequest(methods.POST, urls.verifyEmail, data)
+                .then(response => {
+                    console.log(response.data)
+                    //storing token async
+                    saveToken('secure_token',response.data.token)
+                    setLoading(false)
+                    navigation.replace(ScreenNames.HomeScreen)
+                })
+                .catch(error => {
+                    console.log(error.response.data)
+                    showPopUp(error.response.data.message)
+                    setLoading(false)
+                })
+
         }
     }
 
@@ -48,11 +84,13 @@ export default function EnterOtpScreen({ navigation }) {
                 <Button
                     mode="contained"
                     onPress={() => submitHandle()}
-                    loading={loading}
                 >
                     Submit
                 </Button>
             </View>
+
+            {loading ? <LoaderComponent loading={loading} /> : null}
+
         </View>
     )
 }

@@ -3,5 +3,6 @@ export default ScreenNames = {
     SignupScreen: "SignupScreen",
     ForgetPasswordScreen: "ForgetPasswordScreen",
     EnterOtpScreen: "EnterOtpScreen",
-    ChangePasswordScreen: "ChangePasswordScreen"
+    ChangePasswordScreen: "ChangePasswordScreen",
+    HomeScreen: "HomeScreen"
 }

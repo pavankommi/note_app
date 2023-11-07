@@ -16,7 +16,8 @@ export default function LoaderComponent(data) {
             top: 0,
             bottom: 0,
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            zIndex: 9999
         }}>
             <ActivityIndicator
                 animating={loading}

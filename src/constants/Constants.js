@@ -12,3 +12,19 @@ export function validateEmail(text) {
         return false;
     }
 }
+
+const methods = {
+    GET: 'get',
+    POST: 'post'
+}
+
+const urls = {
+    loginUrl: 'users/login',
+    verifyEmail: 'users/verifyEmail',
+    logout: 'users/logout'
+}
+
+export {
+    methods,
+    urls,
+}
