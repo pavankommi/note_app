@@ -13,6 +13,17 @@ export function validateEmail(text) {
     }
 }
 
+export function validatePhone(text) {
+    let reg = /^\d{10}$/;
+    if (reg.test(text) === false) {
+        console.log("Phone is Not Correct");
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 const methods = {
     GET: 'get',
     POST: 'post'
@@ -20,6 +31,7 @@ const methods = {
 
 const urls = {
     loginUrl: 'users/login',
+    signUp: 'users/signUp',
     verifyEmail: 'users/verifyEmail',
     logout: 'users/logout'
 }
