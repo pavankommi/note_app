@@ -33,7 +33,9 @@ const urls = {
     loginUrl: 'users/login',
     signUp: 'users/signUp',
     verifyEmail: 'users/verifyEmail',
-    logout: 'users/logout'
+    logout: 'users/logout',
+    forgotPassword: 'users/forgotPassword',
+    resetPassword: 'users/resetPassword'
 }
 
 export {

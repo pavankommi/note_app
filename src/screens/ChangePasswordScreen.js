@@ -2,8 +2,14 @@ import React, { useState } from 'react'
 import { StatusBar, Text, TouchableOpacity, View } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
 import { Button, TextInput, useTheme } from 'react-native-paper'
+import { apiRequest } from '../Api'
+import ScreenNames from '../navigation/Constants.js'
+import LoaderComponent from '../components/LoaderComponent'
+import { methods, urls } from '../constants/Constants'
 
-export default function ChangePasswordScreen({ navigation }) {
+export default function ChangePasswordScreen({ route, navigation }) {
+
+    const { email, otp, screen } = route.params;
 
     const [loading, setLoading] = useState(false)
     const [password, setPassword] = useState('')
@@ -15,6 +21,15 @@ export default function ChangePasswordScreen({ navigation }) {
     const [confirmPasswordError, setConfirmPasswordError] = useState(false)
 
     const theme = useTheme();
+
+    const showPopUp = (data) => {
+        showMessage({
+            message: "Note Down.",
+            description: data,
+            titleStyle: { marginTop: StatusBar.currentHeight },
+            backgroundColor: theme.colors.primary
+        });
+    }
 
     const handleSubmit = () => {
         if (password.length == 0) {
@@ -53,6 +68,28 @@ export default function ChangePasswordScreen({ navigation }) {
             });
         } else {
             console.log('change password')
+
+            let data = JSON.stringify({
+                "email": `${email}`,
+                "resetToken": `${otp}`,
+                "newPassword": `${password}`
+            });
+
+            setLoading(true)
+
+            apiRequest(methods.POST, urls.resetPassword, data)
+                .then(response => {
+                    console.log(response)
+                    showPopUp(response.data.message)
+                    setLoading(false)
+                    navigation.navigate(ScreenNames.LoginScreen)
+                })
+                .catch(error => {
+                    console.log(error.response.data)
+                    showPopUp(error.response.data.message)
+                    setLoading(false)
+                })
+
         }
     }
 
@@ -91,11 +128,11 @@ export default function ChangePasswordScreen({ navigation }) {
                 <Button
                     mode="contained"
                     onPress={() => handleSubmit()}
-                    loading={loading}
                 >
                     Submit
                 </Button>
             </View>
+            {loading ? <LoaderComponent loading={loading} /> : null}
         </View>
     )
 }

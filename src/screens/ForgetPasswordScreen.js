@@ -3,8 +3,9 @@ import { StatusBar, View } from 'react-native'
 import { Button, TextInput, useTheme } from 'react-native-paper'
 import ScreenNames from '../navigation/Constants.js'
 import { showMessage } from 'react-native-flash-message'
-import { validateEmail } from '../constants/Constants.js'
+import { methods, urls, validateEmail } from '../constants/Constants.js'
 import LoaderComponent from '../components/LoaderComponent.js'
+import { apiRequest } from '../Api.js'
 
 
 export default function ForgetPasswordScreen({ navigation }) {
@@ -16,6 +17,15 @@ export default function ForgetPasswordScreen({ navigation }) {
     const [emailError, setEmailError] = useState(false)
 
     const theme = useTheme();
+
+    const showPopUp = (data) => {
+        showMessage({
+            message: "Note Down.",
+            description: data,
+            titleStyle: { marginTop: StatusBar.currentHeight },
+            backgroundColor: theme.colors.primary
+        });
+    }
 
     const submitHandle = () => {
         if (email.length == 0) {
@@ -37,7 +47,29 @@ export default function ForgetPasswordScreen({ navigation }) {
             });
         } else {
             setEmailError(false)
-            navigation.navigate(ScreenNames.EnterOtpScreen)
+
+            let data = JSON.stringify({
+                "email": `${email}`,
+            });
+
+            setLoading(true)
+
+            apiRequest(methods.POST, urls.forgotPassword, data)
+                .then(response => {
+                    console.log(response)
+                    showPopUp(response.data.message)
+                    setLoading(false)
+                    navigation.navigate(ScreenNames.EnterOtpScreen, {
+                        email: email,
+                        screen: 'forgotPassword'
+                    })
+                })
+                .catch(error => {
+                    console.log(error.response.data)
+                    showPopUp(error.response.data.message)
+                    setLoading(false)
+                })
+                
         }
     }
 
