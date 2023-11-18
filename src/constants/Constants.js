@@ -35,7 +35,11 @@ const urls = {
     verifyEmail: 'users/verifyEmail',
     logout: 'users/logout',
     forgotPassword: 'users/forgotPassword',
-    resetPassword: 'users/resetPassword'
+    resetPassword: 'users/resetPassword',
+    getallNotes: 'note/getallNotes',
+    addNote: 'note/addNote',
+    deleteNote: 'note/deleteNote',
+    updateNote: 'note/updateNote'
 }
 
 export {

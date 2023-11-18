@@ -6,7 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import ScreenNames from './Constants.js'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ForgetPasswordScreen from '../screens/ForgetPasswordScreen';
 import { constants, methods, urls } from '../constants/Constants';
 import EnterOtpScreen from '../screens/EnterOtpScreen';
@@ -15,6 +15,7 @@ import HomeScreen from '../screens/HomeScreen.js';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons.js';
 import { apiRequest, logoutRequest } from '../Api.js';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
+import AddNoteScreen from '../screens/AddNoteScreen.js';
 
 export default function StackNavigator() {
 
@@ -52,9 +53,21 @@ export default function StackNavigator() {
 
     const logoutHandle = (token) => {
 
-        let headers = { 'Authorization': `Bearer {{${token}}}` }
+        Alert.alert('Hold on!', 'Are you sure you want to log out?', [
+            {
+                text: 'Cancel',
+                onPress: () => null,
+                style: 'cancel',
+            },
+            { text: 'YES', onPress: () => logoutFunc(token) },
+        ]);
+        return true;
 
+    }
+
+    const logoutFunc = (token) => {
         setLoading(true)
+        let headers = { 'Authorization': `Bearer {{${token}}}` }
         logoutRequest(methods.POST, urls.logout, headers)
             .then(response => {
                 console.log(response.data.message)
@@ -75,7 +88,6 @@ export default function StackNavigator() {
                 // showPopUp(error.response.data.message)
                 setLoading(false)
             })
-
     }
 
     if (!loaded) {
@@ -160,6 +172,17 @@ export default function StackNavigator() {
                                 </TouchableOpacity>}
                         </View>
                     )
+                }}
+            />
+            <Stack.Screen
+                name={ScreenNames.AddNoteScreen}
+                component={AddNoteScreen}
+                options={{
+                    title: constants.appName,
+                    headerTitleStyle: {
+                        fontFamily: "Montserrat"
+                    },
+                    headerTitleAlign: "center"
                 }}
             />
         </Stack.Navigator>
