@@ -118,6 +118,7 @@ export default function EnterOtpScreen({ route, navigation }) {
                     mode='outlined'
                     error={otpError}
                     keyboardType='number-pad'
+                    maxLength={6}
                 />
             </View>
             <View style={{ padding: 5 }}>
