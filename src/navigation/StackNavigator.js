@@ -53,7 +53,7 @@ export default function StackNavigator() {
 
     const logoutHandle = (token) => {
 
-        Alert.alert('Hold on!', 'Are you sure you want to log out?', [
+        Alert.alert('Confirm Logout!', 'Are you sure you want to log out? You will be redirected to the login screen.', [
             {
                 text: 'Cancel',
                 onPress: () => null,

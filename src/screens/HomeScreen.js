@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, TouchableOpacity, View } from 'react-native'
+import { Alert, FlatList, TouchableOpacity, View } from 'react-native'
 import * as SecureStore from 'expo-secure-store';
 import { useIsFocused } from "@react-navigation/native";
 import LoaderComponent from '../components/LoaderComponent'
@@ -62,6 +62,18 @@ export default function HomeScreen({ navigation }) {
     }
 
     const deleteNoteHandler = async (item) => {
+        Alert.alert('Confirm Note Deletion!', 'Are you sure you want to delete this note? This action cannot be undone.', [
+            {
+                text: 'Cancel',
+                onPress: () => null,
+                style: 'cancel',
+            },
+            { text: 'YES', onPress: () => deleteFunc(item) },
+        ]);
+        return true;
+    }
+
+    const deleteFunc = async (item) => {
         setLoading(true)
 
         let key = 'secure_token'
@@ -86,7 +98,6 @@ export default function HomeScreen({ navigation }) {
                 setIsRefreshing(false)
                 loadNotes()
             })
-
     }
 
     const onScroll = ({ nativeEvent }) => {
