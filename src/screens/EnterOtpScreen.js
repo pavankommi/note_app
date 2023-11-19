@@ -74,31 +74,38 @@ export default function EnterOtpScreen({ route, navigation }) {
                 showPopUp("Please enter OTP")
             } else {
 
-                let data = JSON.stringify({
-                    // "email": "rkodali1s@semo.edu",
-                    // "password": "Rupa.123"
-                    "email": `${email}`,
-                    "code": `${otp}`
-                });
+                setLoading(false)
+                navigation.navigate(ScreenNames.ChangePasswordScreen, {
+                    email: email,
+                    otp: otp,
+                    screen: 'forgotPassword'
+                })
 
-                setLoading(true)
+                // let data = JSON.stringify({
+                //     // "email": "rkodali1s@semo.edu",
+                //     // "password": "Rupa.123"
+                //     "email": `${email}`,
+                //     "code": `${otp}`
+                // });
 
-                apiRequest(methods.POST, urls.forgotPassword, data)
-                    .then(response => {
-                        console.log(response)
-                        // showPopUp(response.data.message)
-                        setLoading(false)
-                        navigation.navigate(ScreenNames.ChangePasswordScreen, {
-                            email: email,
-                            otp: otp,
-                            screen: 'forgotPassword'
-                        })
-                    })
-                    .catch(error => {
-                        console.log(error.response.data)
-                        showPopUp(error.response.data.message)
-                        setLoading(false)
-                    })
+                // setLoading(true)
+
+                // apiRequest(methods.POST, urls.forgotPassword, data)
+                //     .then(response => {
+                //         console.log(response)
+                //         // showPopUp(response.data.message)
+                //         setLoading(false)
+                //         navigation.navigate(ScreenNames.ChangePasswordScreen, {
+                //             email: email,
+                //             otp: otp,
+                //             screen: 'forgotPassword'
+                //         })
+                //     })
+                //     .catch(error => {
+                //         console.log(error.response.data)
+                //         showPopUp(error.response.data.message)
+                //         setLoading(false)
+                //     })
 
             }
         }

@@ -75,6 +75,8 @@ export default function ChangePasswordScreen({ route, navigation }) {
                 "newPassword": `${password}`
             });
 
+            console.log(data)
+
             setLoading(true)
 
             apiRequest(methods.POST, urls.resetPassword, data)
